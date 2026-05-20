@@ -862,17 +862,8 @@ Group related feedback into one proposal rather than many tiny ones. Omit noise.
   };
 
   // ── Proposal actions ───────────────────────────────────────────────────────
-  const updateProposal = (synthId, proposalId, status, adminNote) => {
-    // Write to Supabase if available
-    if (window.__supabase) {
-      window.__supabase.from("hitl_proposals")
-        .update({ status, admin_note: adminNote, reviewed_at: new Date().toISOString() })
-        .eq("id", proposalId)
-        .then(() => {
-          setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, status, admin_note: adminNote } : p));
-        });
-    }
-    // Always update localStorage-backed syntheses as fallback
+  const updateProposal = async (synthId, proposalId, status, adminNote) => {
+    // Optimistically update local state
     const next = syntheses.map(s => {
       if (s.id !== synthId) return s;
       return {
@@ -884,8 +875,22 @@ Group related feedback into one proposal rather than many tiny ones. Omit noise.
     });
     saveSyntheses(next);
     setSyntheses(next);
-    // Also reflect in proposals list (for Supabase-sourced cards)
     setProposals(prev => prev.map(p => p.id === proposalId ? { ...p, status, admin_note: adminNote } : p));
+
+    // Persist to Supabase via server endpoint (uses service role key to bypass RLS)
+    try {
+      const res = await fetch(`/api/proposals/${proposalId}/status`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status, admin_note: adminNote }),
+      });
+      if (!res.ok) {
+        const json = await res.json().catch(() => ({}));
+        console.error("Failed to persist proposal status:", json.error || res.statusText);
+      }
+    } catch (e) {
+      console.error("Failed to persist proposal status:", e.message);
+    }
   };
 
   const applyProposal = async (proposalId) => {
