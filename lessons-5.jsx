@@ -11,7 +11,12 @@ function Lesson14() {
         meta={["4 min read", "Orchestrator pattern", "Live example"]}
       />
 
+      <p style={{ color: "var(--ink-2)", marginTop: 8, marginBottom: 0 }}>
+        This is the capstone: a real orchestrator pattern running live on this course. You'll see the architecture, understand how each node maps to a pattern you've already learned, and get the setup checklist to wire it yourself.
+      </p>
+
       <section>
+        <h3 style={{ color: "var(--ink-3)", fontWeight: 600, fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Part 1 — The architecture</h3>
         <h2>This isn't a demo</h2>
         <p>
           Most courses talk about AI-native architectures. This one runs on one. The feedback panel at the bottom of each lesson doesn't just collect stars — it feeds a live learning loop that proposes content improvements and can open a GitHub PR to apply them.
@@ -67,6 +72,7 @@ function Lesson14() {
       </section>
 
       <section>
+        <h3 style={{ color: "var(--ink-3)", fontWeight: 600, fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Part 2 — The infrastructure</h3>
         <h2>The three infrastructure pieces</h2>
         <CodeTabs files={[
           {
@@ -124,6 +130,7 @@ hitl_proposals (id, synthesis_id, lesson_id, severity,
       </section>
 
       <section>
+        <h3 style={{ color: "var(--ink-3)", fontWeight: 600, fontSize: "0.75rem", letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 4 }}>Part 3 — Set it up</h3>
         <h2>Setup checklist</h2>
         <p>
           The architecture is live when you complete these six steps. Until then the system falls back gracefully to localStorage and local synthesis via <code>window.claude.complete</code>.

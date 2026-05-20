@@ -13,6 +13,15 @@ const Lesson1 = ({ onNavigate }) => (
       Design used to mean static frames handed to engineers. Today, an AI-native designer is a <em>director</em> — they describe intent, supply taste, and let agents do the production. This course teaches you the stack.
     </p>
 
+    <Callout kind="tip" title="New to these terms?">
+      <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
+        <li><strong>AI-native designer</strong> — a designer who uses AI as a collaborator in their core workflow, not just for one-off tasks.</li>
+        <li><strong>Agent</strong> — an AI that can take actions (read files, call APIs, open PRs) not just generate text. Covered in depth in Lessons 5–9.</li>
+        <li><strong>MCP</strong> — Model Context Protocol. A standard that lets Claude talk to external tools like Figma, GitHub, and Vercel. Covered in Lesson 8.</li>
+        <li><strong>Intent</strong> — a clear description of the goal and constraints you give an agent, so it can make good decisions without you micromanaging every step.</li>
+      </ul>
+    </Callout>
+
     <section>
       <h3>What you'll be able to do</h3>
       <div className="two-col">
@@ -100,7 +109,7 @@ const Lesson2 = () => (
         </div>
         <div className="cheat-card">
           <h5>Code</h5>
-          <p>Agentic. Claude runs a loop — plan, act, observe, repeat — on your repo autonomously. You approve the plan; it executes. Claude Code covers this in depth.</p>
+          <p>Agentic. Claude runs a loop — plan, act, observe, repeat — directly on your codebase. You describe the task ("add a dark-mode token layer to the design system"), approve the plan, and Claude reads files, writes changes, and stages a commit. Lesson 3 covers installation and your first session.</p>
         </div>
       </div>
       <Callout kind="note" title="Same app, three gears">
