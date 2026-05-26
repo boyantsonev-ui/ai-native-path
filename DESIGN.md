@@ -130,20 +130,3 @@ Learners submit ratings and chat questions via `<FeedbackPanel>` at the bottom o
 
 Lesson 14 ("The course that teaches itself") documents this architecture in full, using the same components taught in earlier lessons.
 
----
-
-## Google Sign-In setup (optional auth)
-
-The course works fully without auth (localStorage only). Google Sign-In enables cross-device progress sync via Supabase `user_progress`.
-
-**Manual steps required:**
-
-1. **Supabase dashboard** → Authentication → Providers → Google → Enable
-2. **Google Cloud Console** → APIs & Services → Credentials → Create OAuth 2.0 Client ID (Web application)
-   - Authorised JavaScript origins: your domain(s) + `http://localhost:PORT`
-   - Authorised redirect URIs: `https://<YOUR_PROJECT>.supabase.co/auth/v1/callback`
-3. Paste the **Client ID** and **Client Secret** into Supabase Google provider settings
-4. **Run the migration** in the Supabase SQL editor:
-   `supabase/migrations/20260526_user_progress.sql`
-
-The `AuthButton` component renders in the sidebar footer. It reads `window.__supabase` (configured in `app.jsx`) and calls `signInWithOAuth({ provider: 'google' })`. Progress merges on sign-in (union of local + remote; higher points wins).
