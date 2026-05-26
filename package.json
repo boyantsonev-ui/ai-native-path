@@ -1,5 +1,5 @@
 {
-  "name": "ai-native-designer-101",
+  "name": "ai-native-builder",
   "private": true,
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",

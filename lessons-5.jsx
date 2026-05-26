@@ -281,7 +281,7 @@ const SUPABASE_ANON_KEY = "eyJhbGci...your-anon-key-here";`}
               <p>Submit a test rating, confirm the Supabase write, then trigger your first synthesis manually:</p>
               <ol style={{ paddingLeft: 18, color: "var(--ink-2)", display: "flex", flexDirection: "column", gap: 12, marginTop: 12 }}>
                 <li><strong>Submit feedback</strong> — Rate any lesson. Open <strong>Supabase → Table Editor → feedback</strong>. A new row should appear with <code>synthesized = false</code>. If it doesn't, check that <code>SUPABASE_URL</code> and <code>SUPABASE_ANON_KEY</code> in <code>app.jsx</code> match your project.</li>
-                <li><strong>Unlock the admin dashboard</strong> — Click the <strong>"AI-Native Designer 101"</strong> brand logo in the sidebar <strong>five times in quick succession</strong> → enter your admin password → you're in.</li>
+                <li><strong>Unlock the admin dashboard</strong> — Click the <strong>"AI-Native Builder"</strong> brand logo in the sidebar <strong>five times in quick succession</strong> → enter your admin password → you're in.</li>
                 <li><strong>Run synthesis</strong> — Go to the <strong>Automations</strong> tab → click <strong>"Run synthesis now"</strong>. The manual trigger bypasses the 15-item threshold. A proposal should appear in the <strong>HITL Proposals</strong> tab within 10–15 seconds.</li>
                 <li><strong>Approve & auto-apply</strong> — Find a <strong>trivial</strong> proposal (moss-coloured badge) → click <strong>Approve</strong> → <strong>Apply automatically</strong>. A branch named <code>auto-fix/…</code> and a PR should appear in GitHub within 30 seconds.</li>
               </ol>

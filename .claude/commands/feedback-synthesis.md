@@ -1,10 +1,10 @@
 ---
-description: Weekly synthesis of learner feedback for AI-Native Designer 101. Reads exported feedback JSON, runs Claude analysis, and outputs ranked HITL improvement proposals.
+description: Weekly synthesis of learner feedback for AI-Native Builder. Reads exported feedback JSON, runs Claude analysis, and outputs ranked HITL improvement proposals.
 schedule: 0 9 * * MON
 output: .claude/outputs/synthesis-{{date}}.md
 ---
 
-# Feedback synthesis — AI-Native Designer 101
+# Feedback synthesis — AI-Native Builder
 
 ## Purpose
 

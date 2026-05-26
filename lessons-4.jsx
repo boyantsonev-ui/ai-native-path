@@ -105,7 +105,7 @@ const Lesson13 = () => (
   <>
     <HeroCard
       eyebrow="You're done"
-      title="From designer to director."
+      title="From builder to director."
       lede="You now know enough to compose Claude, MCP servers, agents, and analytics into a real product loop. The rest is reps."
       meta={["Glossary in sidebar", "Save this page"]}
     />
@@ -146,7 +146,7 @@ const Lesson13 = () => (
     <QuizTiered tiers={[
       {
         label: "Beginner",
-        question: "Which habit is most useful to build as an AI-native designer?",
+        question: "Which habit is most useful to build as an AI-native builder?",
         options: [
           "Learning to write Python scripts",
           "Reviewing AI outputs before shipping and encoding corrections as Skills",
@@ -158,7 +158,7 @@ const Lesson13 = () => (
       },
       {
         label: "Intermediate",
-        question: "The single most important habit of an AI-native designer is…",
+        question: "The single most important habit of an AI-native builder is…",
         options: [
           "Using the newest model",
           "Writing a sharper brief",
@@ -185,7 +185,7 @@ const Lesson13 = () => (
     <div style={{ textAlign: "center", marginTop: 60, paddingTop: 40, borderTop: "1px solid var(--rule)" }}>
       <div className="eyebrow" style={{ justifyContent: "center", display: "inline-flex" }}>End of course</div>
       <p style={{ fontFamily: "var(--serif)", fontSize: 24, marginTop: 18, color: "var(--ink)" }}>
-        Now go ship something a designer couldn't ship a year ago.
+        Now go ship something a builder couldn't ship a year ago.
       </p>
     </div>
   </>

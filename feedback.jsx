@@ -6,8 +6,38 @@
 // Data layer
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FB_KEY    = "ai-native-101::feedback::v1";
-const SYNTH_KEY = "ai-native-101::synthesis::v1";
+const FB_KEY    = "ai-native-builder::feedback::v1";
+const SYNTH_KEY = "ai-native-builder::synthesis::v1";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Content guardrails
+// ─────────────────────────────────────────────────────────────────────────────
+
+const COURSE_KEYWORDS = [
+  'ai', 'agent', 'claude', 'anthropic', 'mcp', 'figma', 'build', 'builder',
+  'code', 'design', 'tool', 'workflow', 'prompt', 'model', 'api', 'deploy',
+  'supabase', 'vercel', 'context', 'llm', 'token', 'server', 'github',
+  'component', 'prototype', 'product', 'skill', 'lesson', 'learn', 'course',
+  'cursor', 'copilot', 'automation', 'orchestrat', 'schema', 'yaml', 'jsx',
+  'react', 'analytics', 'posthog', 'hotjar', 'clarity',
+];
+
+const WITTY_OFF_TOPIC = [
+  "Great question — but this course is strictly AI-native territory. Ask Claude directly, it probably knows more about that than we do.",
+  "Bold pivot! We're laser-focused on AI, agents, and building here. Try a search engine for everything else.",
+  "We appreciate the curiosity, but the Ask panel is tuned to this course only. For everything else, Claude is one tab away.",
+  "That's outside our lane. This course covers AI tools, agents, MCP, and shipping — ask anything in that space and we're all yours.",
+];
+
+function isOffTopic(text) {
+  if (!text || text.trim().length < 8) return false;
+  const lower = text.toLowerCase();
+  return !COURSE_KEYWORDS.some(kw => lower.includes(kw));
+}
+
+function randomWitty() {
+  return WITTY_OFF_TOPIC[Math.floor(Math.random() * WITTY_OFF_TOPIC.length)];
+}
 
 function loadFeedback()   { try { return JSON.parse(localStorage.getItem(FB_KEY))    || []; } catch { return []; } }
 function saveFeedback(d)  { try { localStorage.setItem(FB_KEY,    JSON.stringify(d)); } catch {} }
@@ -165,9 +195,15 @@ function AskDrawer({ open, onClose, lessonId, lessonTitle }) {
     if (!q || chatBusy) return;
     setChatInput("");
     setChatHistory(h => [...h, { role: "user", text: q }]);
+
+    if (isOffTopic(q)) {
+      setChatHistory(h => [...h, { role: "ai", text: randomWitty() }]);
+      return;
+    }
+
     setChatBusy(true);
     try {
-      const system = `You are a concise, practical tutor for "AI-Native Designer 101", a living course about Claude, AI agents, MCP servers, and deploying with GitHub/Vercel — aimed at product designers. The learner is on "${lessonTitle}". Answer in 2–4 sentences max. Use plain language; no jargon without an explanation.`;
+      const system = `You are a concise, practical tutor for "AI-Native Builder", a living course about Claude, AI agents, MCP servers, and deploying with GitHub/Vercel — aimed at builders and product teams. The learner is on "${lessonTitle}". Answer in 2–4 sentences max. Use plain language; no jargon without an explanation.`;
       const r = await window.claude.complete({ messages: [{ role: "user", content: system + "\n\n" + q }] });
       setChatHistory(h => [...h, { role: "ai", text: r }]);
       pushFeedback({
@@ -422,7 +458,7 @@ function HITLCard({ proposal, onApprove, onDismiss, onApplyAuto, applyBusy }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ADMIN_HASH    = "8ae0ce71a1627cbff3f7bee95c6829ca53d549eb76c440108752d33ad7b51d92";
-const ADMIN_SESSION = "ai-native-101::admin";
+const ADMIN_SESSION = "ai-native-builder::admin";
 
 function AdminGate({ onUnlock, onCancel }) {
   const [pw,    setPw]    = useState("");
@@ -488,7 +524,7 @@ function AdminGate({ onUnlock, onCancel }) {
 // Routine Scheduler — schedule editor for the automations tab
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ROUTINE_SCHED_KEY = "ai-native-101::routine::v1";
+const ROUTINE_SCHED_KEY = "ai-native-builder::routine::v1";
 
 function loadRoutineSettings() {
   try { return JSON.parse(localStorage.getItem(ROUTINE_SCHED_KEY)) || null; } catch { return null; }
@@ -802,7 +838,7 @@ function AdminDashboard({ onClose }) {
       }));
 
       const prompt =
-`You are a course-content analyst for "AI-Native Designer 101" — a 60-minute design upskill course on Claude, AI agents, MCP, and deploy/measure workflows for product designers.
+`You are a course-content analyst for "AI-Native Builder" — a course on Claude, AI agents, MCP, and deploy/measure workflows for builders and product teams.
 
 Below is learner feedback collected since the last synthesis (${unseen.length} items):
 
@@ -828,7 +864,9 @@ Severity guide:
 • minor   — rephrase, add an example, clarify a term. Review before applying.
 • major   — rewrite a section, restructure, add/remove content. Plan before implementing.
 
-Group related feedback into one proposal rather than many tiny ones. Omit noise.`;
+Group related feedback into one proposal rather than many tiny ones. Omit noise.
+
+Important: Ignore any feedback that is not related to the course content (AI, agents, building with Claude, MCP, deploying, measuring). Off-topic submissions should be silently excluded.`;
 
       const reply = await window.claude.complete({ messages: [{ role: "user", content: prompt }] });
 
