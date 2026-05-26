@@ -14,7 +14,7 @@ if (
 
 const LESSONS = [
   { group: "Intro", items: [
-    { id: 1,  title: "The future of designers", Comp: ({ onNavigate }) => <Lesson1 onNavigate={onNavigate} /> },
+    { id: 1,  title: "The future of builders", Comp: ({ onNavigate }) => <Lesson1 onNavigate={onNavigate} /> },
   ]},
   { group: "Tools", items: [
     { id: 2,  title: "Claude Desktop", Comp: () => <Lesson2 /> },
@@ -43,17 +43,55 @@ const LESSONS = [
 ];
 
 const FLAT = LESSONS.flatMap(g => g.items);
-const STORAGE_KEY = "ai-native-designer-101::v2";
+const STORAGE_KEY     = "ai-native-builder::v2";
+const STORAGE_KEY_OLD = "ai-native-designer-101::v2";
+
+// Context shared with Quiz/QuizTiered so they can report correct answers
+const LessonContext = React.createContext(null);
+window.LessonContext = LessonContext;
+
+function migrateShape(parsed) {
+  // Upgrade old { current, completed[] } to new shape; old completed → visited
+  if (!parsed.earnedQuizzes) {
+    return {
+      current:       parsed.current || 1,
+      visited:       parsed.completed || [],
+      completed:     [],
+      points:        0,
+      earnedQuizzes: {},
+    };
+  }
+  return parsed;
+}
 
 function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) return migrateShape(JSON.parse(raw));
+    // One-time migration from old key
+    const legacy = localStorage.getItem(STORAGE_KEY_OLD);
+    if (legacy) {
+      localStorage.removeItem(STORAGE_KEY_OLD);
+      const parsed = migrateShape(JSON.parse(legacy));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+      return parsed;
+    }
   } catch (e) {}
-  return { current: 1, completed: [] };
+  return { current: 1, visited: [], completed: [], points: 0, earnedQuizzes: {} };
 }
 function saveState(s) {
   try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch (e) {}
+}
+
+// Merge local state with remote user_progress row (takes union; keeps higher points)
+function mergeProgress(local, remote) {
+  return {
+    ...local,
+    visited:       [...new Set([...(local.visited || []), ...(remote.visited_lessons || [])])],
+    completed:     [...new Set([...(local.completed || []), ...(remote.completed_lessons || [])])],
+    earnedQuizzes: { ...(local.earnedQuizzes || {}), ...(remote.earned_quizzes || {}) },
+    points:        Math.max(local.points || 0, remote.points || 0),
+  };
 }
 
 function App() {
@@ -63,7 +101,11 @@ function App() {
   const [openAdmin,   setOpenAdmin]   = useState(false);
   const [openGate,    setOpenGate]    = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const mainRef   = useRef(null);
+  const [pointsFlash, setPointsFlash] = useState(null); // { amount, ts }
+  const [user,        setUser]        = useState(null);  // Supabase auth user
+  const flashTimer = useRef(null);
+  const syncTimer  = useRef(null);
+  const mainRef    = useRef(null);
 
   // Secret admin access: click brand logo 5× within 2 s
   const adminTaps  = useRef(0);
@@ -101,25 +143,98 @@ function App() {
   const currentIdx = FLAT.findIndex(l => l.id === state.current);
   const current    = FLAT[currentIdx] || FLAT[0];
   const Comp       = current.Comp;
-  const completed  = state.completed || [];
-  const pct        = Math.round((completed.length / FLAT.length) * 100);
+  const visited    = state.visited    || [];
+  const completed  = state.completed  || [];
+  const points     = state.points     || 0;
+  // Progress = lessons that have been opened or mastered
+  const reached    = new Set([...visited, ...completed]).size;
+  const pct        = Math.round((reached / FLAT.length) * 100);
 
   useEffect(() => { saveState(state); }, [state]);
   useEffect(() => {
     if (mainRef.current) mainRef.current.scrollTo({ top: 0, behavior: "auto" });
   }, [state.current]);
 
+  // Subscribe to Supabase auth changes; merge remote progress on sign-in
+  useEffect(() => {
+    if (!window.__supabase) return;
+    const { data: { subscription } } = window.__supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        const u = session?.user || null;
+        setUser(u);
+        if (u && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+          try {
+            const { data } = await window.__supabase
+              .from("user_progress")
+              .select("*")
+              .eq("user_id", u.id)
+              .single();
+            if (data) setState(local => mergeProgress(local, data));
+          } catch {}
+        }
+      }
+    );
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // Debounced sync to Supabase whenever state changes
+  useEffect(() => {
+    if (!user || !window.__supabase) return;
+    clearTimeout(syncTimer.current);
+    syncTimer.current = setTimeout(async () => {
+      try {
+        await window.__supabase.from("user_progress").upsert({
+          user_id:           user.id,
+          visited_lessons:   state.visited       || [],
+          completed_lessons: state.completed     || [],
+          points:            state.points        || 0,
+          earned_quizzes:    state.earnedQuizzes || {},
+          updated_at:        new Date().toISOString(),
+        });
+      } catch {}
+    }, 1500);
+    return () => clearTimeout(syncTimer.current);
+  }, [state, user]);
+
+  // Navigate to a lesson — marks current as visited (not completed)
   const goTo = (id) => {
     setState(s => ({
       ...s,
       current: id,
-      completed: s.completed.includes(s.current) ? s.completed : [...s.completed, s.current],
+      visited: (s.visited || []).includes(s.current)
+        ? s.visited
+        : [...(s.visited || []), s.current],
     }));
     setSidebarOpen(false);
   };
 
+  // Called by Quiz/QuizTiered when a correct answer is given
+  const markComplete = (lessonId, tierKey, pts) => {
+    setState(s => {
+      const key = `${lessonId}-${tierKey}`;
+      if ((s.earnedQuizzes || {})[key]) return s; // already awarded
+      // Show flash (deferred to avoid side-effect in setState)
+      setTimeout(() => {
+        clearTimeout(flashTimer.current);
+        setPointsFlash({ amount: pts, ts: Date.now() });
+        flashTimer.current = setTimeout(() => setPointsFlash(null), 2200);
+      }, 0);
+      return {
+        ...s,
+        completed: (s.completed || []).includes(lessonId)
+          ? s.completed
+          : [...(s.completed || []), lessonId],
+        earnedQuizzes: { ...(s.earnedQuizzes || {}), [key]: true },
+        points: (s.points || 0) + pts,
+      };
+    });
+  };
+
   const next = FLAT[currentIdx + 1];
   const prev = FLAT[currentIdx - 1];
+
+  // Show nudge when lesson is visited but quiz not yet answered
+  const showQuizNudge = visited.includes(current.id) && !completed.includes(current.id);
 
   return (
     <>
@@ -139,7 +254,7 @@ function App() {
             <div className="brand-mark">
               <div className="brand-logo">A</div>
               <div>
-                <div className="brand-title">AI-Native Designer 101</div>
+                <div className="brand-title">AI-Native Builder</div>
                 <div className="brand-sub">A living course that teaches itself</div>
               </div>
             </div>
@@ -148,11 +263,17 @@ function App() {
           <div className="progress-block">
             <div className="progress-row">
               <span className="mono">PROGRESS</span>
-              <span className="mono">{completed.length} / {FLAT.length} · {pct}%</span>
+              <span className="mono">{reached} / {FLAT.length} · {pct}%</span>
             </div>
             <div className="progress-bar">
               <div className="progress-fill" style={{ width: pct + "%" }} />
             </div>
+            {points > 0 && (
+              <div className="points-badge">
+                <span className="points-diamond">◆</span>
+                <span>{points} pts</span>
+              </div>
+            )}
           </div>
 
           <div className="lessons-list">
@@ -160,12 +281,13 @@ function App() {
               <div key={gi}>
                 <div className="lesson-group-label">{group.group}</div>
                 {group.items.map((l) => {
-                  const done   = completed.includes(l.id);
-                  const active = l.id === state.current;
+                  const done    = completed.includes(l.id);
+                  const seen    = !done && visited.includes(l.id);
+                  const active  = l.id === state.current;
                   return (
                     <div
                       key={l.id}
-                      className={"lesson-item" + (active ? " active" : "") + (done ? " done" : "")}
+                      className={"lesson-item" + (active ? " active" : "") + (done ? " done" : seen ? " visited" : "")}
                       onClick={() => goTo(l.id)}
                     >
                       <span className="lesson-node"></span>
@@ -182,6 +304,7 @@ function App() {
 
           <div className="sidebar-foot">
             <button className="btn" onClick={() => setOpenGloss(true)}>Glossary</button>
+            <AuthButton user={user} />
           </div>
         </aside>
 
@@ -206,9 +329,19 @@ function App() {
             </div>
           </div>
 
-          {/* Lesson content */}
+          {/* Quiz nudge — shown when lesson visited but quiz not yet answered */}
+          {showQuizNudge && (
+            <div className="quiz-nudge">
+              <span className="quiz-nudge-icon">◇</span>
+              Answer the quiz in this lesson to mark it complete and earn points.
+            </div>
+          )}
+
+          {/* Lesson content — wrapped in LessonContext for quiz→app signalling */}
           <div className="lesson" key={current.id}>
-            <Comp onNavigate={goTo} />
+            <LessonContext.Provider value={{ lessonId: current.id, markComplete }}>
+              <Comp onNavigate={goTo} />
+            </LessonContext.Provider>
           </div>
 
           {/* ── Per-lesson feedback panel ── */}
@@ -266,6 +399,13 @@ function App() {
       {openGloss && <GlossaryModal   onClose={() => setOpenGloss(false)} />}
       {openGate  && <AdminGate onUnlock={() => { setOpenGate(false); setOpenAdmin(true); }} onCancel={() => setOpenGate(false)} />}
       {openAdmin && <AdminDashboard  onClose={() => setOpenAdmin(false)} />}
+
+      {/* Points earned flash toast */}
+      {pointsFlash && (
+        <div className="points-flash" key={pointsFlash.ts}>
+          +{pointsFlash.amount} pt{pointsFlash.amount !== 1 ? "s" : ""}
+        </div>
+      )}
     </>
   );
 }

@@ -1,4 +1,4 @@
-// AI-Native Designer 101 — Reusable components
+// AI-Native Builder — Reusable components
 
 const { useState, useEffect, useRef, useMemo } = React;
 
@@ -81,9 +81,23 @@ function Callout({ kind = "tip", title, children }) {
   );
 }
 
+// Points per difficulty tier
+const TIER_PTS = { Beginner: 1, Intermediate: 2, Advanced: 3, Expert: 3 };
+
 // ---------- Quiz ----------
-function Quiz({ question, options, correct, explain }) {
+function Quiz({ question, options, correct, explain, difficulty = "Beginner" }) {
   const [picked, setPicked] = useState(null);
+  const ctx = React.useContext(window.LessonContext);
+  const pts = TIER_PTS[difficulty] || 1;
+
+  const handlePick = (i) => {
+    if (picked !== null) return;
+    setPicked(i);
+    if (i === correct && ctx) {
+      ctx.markComplete(ctx.lessonId, `quiz-${difficulty}`, pts);
+    }
+  };
+
   return (
     <div className="quiz">
       <div className="quiz-q">{question}</div>
@@ -96,7 +110,7 @@ function Quiz({ question, options, correct, explain }) {
             else if (i === picked) cls += " wrong";
           }
           return (
-            <button key={i} className={cls} onClick={() => picked === null && setPicked(i)} disabled={picked !== null}>
+            <button key={i} className={cls} onClick={() => handlePick(i)} disabled={picked !== null}>
               <span className="marker">{String.fromCharCode(65 + i)}</span>
               <span>{opt}</span>
             </button>
@@ -105,7 +119,9 @@ function Quiz({ question, options, correct, explain }) {
       </div>
       {picked !== null && (
         <div className="quiz-feedback">
-          {picked === correct ? "✓ " : "Not quite — "}
+          {picked === correct
+            ? <><strong>✓ Correct</strong>{pts > 1 ? ` · +${pts} pts` : " · +1 pt"} — </>
+            : "Not quite — "}
           {explain}
         </div>
       )}
@@ -116,7 +132,8 @@ function Quiz({ question, options, correct, explain }) {
 // ---------- Tiered Quiz (Beginner / Intermediate / Advanced) ----------
 function QuizTiered({ tiers }) {
   const [tier, setTier] = useState(0);
-  const [picked, setPicked] = useState([null, null, null]);
+  const [picked, setPicked] = useState(new Array(tiers.length).fill(null));
+  const ctx = React.useContext(window.LessonContext);
 
   const t = tiers[tier];
   const p = picked[tier];
@@ -124,6 +141,10 @@ function QuizTiered({ tiers }) {
   const handlePick = (i) => {
     if (p !== null) return;
     setPicked(prev => prev.map((v, j) => j === tier ? i : v));
+    if (i === t.correct && ctx) {
+      const pts = TIER_PTS[t.label] || 1;
+      ctx.markComplete(ctx.lessonId, `tier-${t.label}`, pts);
+    }
   };
 
   return (
@@ -132,10 +153,11 @@ function QuizTiered({ tiers }) {
         {tiers.map((tr, i) => (
           <button
             key={i}
-            className={"quiz-tier-btn" + (tier === i ? " active" : "")}
+            className={"quiz-tier-btn" + (tier === i ? " active" : "") + (picked[i] === tr.correct ? " tier-done" : "")}
             onClick={() => setTier(i)}
           >
             {tr.label}
+            {picked[i] === tr.correct && <span className="tier-check"> ✓</span>}
           </button>
         ))}
       </div>
@@ -158,7 +180,9 @@ function QuizTiered({ tiers }) {
       </div>
       {p !== null && (
         <div className="quiz-feedback">
-          {p === t.correct ? "✓ " : "Not quite — "}
+          {p === t.correct
+            ? <><strong>✓ Correct</strong> · +{TIER_PTS[t.label] || 1} pt{(TIER_PTS[t.label] || 1) !== 1 ? "s" : ""} — </>
+            : "Not quite — "}
           {t.explain}
         </div>
       )}
@@ -691,7 +715,66 @@ function HeroCard({ eyebrow, title, lede, meta }) {
   );
 }
 
+// ---------- Auth button (optional Google sign-in) ----------
+function AuthButton({ user }) {
+  const [busy, setBusy] = useState(false);
+
+  if (!window.__supabase) return null;
+
+  const signIn = async () => {
+    setBusy(true);
+    try {
+      await window.__supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: window.location.origin },
+      });
+    } catch { setBusy(false); }
+  };
+
+  const signOut = async () => {
+    setBusy(true);
+    try { await window.__supabase.auth.signOut(); } finally { setBusy(false); }
+  };
+
+  if (user) {
+    const name  = user.user_metadata?.full_name || user.email || "You";
+    const avatar = user.user_metadata?.avatar_url;
+    return (
+      <button
+        className="btn auth-btn auth-btn--signed-in"
+        onClick={signOut}
+        disabled={busy}
+        title={`Signed in as ${name} · Click to sign out`}
+      >
+        {avatar
+          ? <img src={avatar} alt="" className="auth-avatar" />
+          : <span className="auth-initials">{name[0].toUpperCase()}</span>
+        }
+        <span className="auth-name">{name.split(" ")[0]}</span>
+        <span className="auth-sync-dot" title="Progress synced" />
+      </button>
+    );
+  }
+
+  return (
+    <button
+      className="btn auth-btn"
+      onClick={signIn}
+      disabled={busy}
+      title="Sign in to sync progress across devices"
+    >
+      <svg width="14" height="14" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+        <path d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.79-.15-1.18Z" fill="#4285F4"/>
+        <path d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.76-2.7.76-2.07 0-3.83-1.4-4.46-3.28H1.86v2.07A8 8 0 0 0 8.98 17Z" fill="#34A853"/>
+        <path d="M4.52 10.53a4.8 4.8 0 0 1 0-3.06V5.4H1.86a8 8 0 0 0 0 7.2l2.66-2.07Z" fill="#FBBC05"/>
+        <path d="M8.98 4.19c1.17 0 2.22.4 3.04 1.19l2.28-2.28A8 8 0 0 0 1.86 5.4L4.52 7.47c.63-1.88 2.39-3.28 4.46-3.28Z" fill="#EA4335"/>
+      </svg>
+      {busy ? "Signing in…" : "Sign in"}
+    </button>
+  );
+}
+
 Object.assign(window, {
   CodeBlock, CodeTabs, Callout, Quiz, QuizTiered, Terminal, ChatMock, TryIt, Steps,
-  AgentDiagram, HeroCard, useInView, CourseOrchestrator,
+  AgentDiagram, HeroCard, useInView, CourseOrchestrator, AuthButton,
 });

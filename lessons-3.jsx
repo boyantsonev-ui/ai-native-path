@@ -3,7 +3,7 @@
 const Lesson10 = () => (
   <>
     <div className="eyebrow">Build</div>
-    <h1 style={{ marginTop: 14, marginBottom: 18 }}>Files an AI-native designer should know</h1>
+    <h1 style={{ marginTop: 14, marginBottom: 18 }}>Files an AI-native builder should know</h1>
     <p className="lede">
       You don't have to be a developer. But you'll touch a small set of file types that quietly run modern product work. Knowing them turns chats into commits.
     </p>
@@ -86,7 +86,7 @@ agents:
     </section>
 
     <Callout kind="do" title="The 'just learn YAML' rule">
-      <p style={{ margin: 0 }}>If a designer learns one new format this year, make it YAML. It unlocks CI, deploys, agent configuration, and most MCP servers — without writing code.</p>
+      <p style={{ margin: 0 }}>If a builder learns one new format this year, make it YAML. It unlocks CI, deploys, agent configuration, and most MCP servers — without writing code.</p>
     </Callout>
 
     <QuizTiered tiers={[
@@ -205,7 +205,7 @@ const Lesson11 = () => (
       },
       {
         label: "Intermediate",
-        question: "Why is the per-branch preview URL so important for designers?",
+        question: "Why is the per-branch preview URL so important for builders?",
         options: [
           "It saves bandwidth",
           "It lets stakeholders review the real, interactive thing — not a screenshot — before merge",

@@ -4,18 +4,18 @@ const Lesson1 = ({ onNavigate }) => (
   <>
     <HeroCard
       eyebrow="Course"
-      title="The future of designers."
+      title="The future of builders."
       lede="You'll go from clicking buttons in Figma to orchestrating agents that build, deploy, and measure your prototypes — in your own voice."
       meta={["14 lessons", "Mixed / hands-on", "Updated May 2026"]}
     />
 
     <p className="lede">
-      Design used to mean static frames handed to engineers. Today, an AI-native designer is a <em>director</em> — they describe intent, supply taste, and let agents do the production. This course teaches you the stack.
+      Design used to mean static frames handed to engineers. Today, an AI-native builder is a <em>director</em> — they describe intent, supply taste, and let agents do the production. This course teaches you the stack.
     </p>
 
     <Callout kind="tip" title="New to these terms?">
       <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
-        <li><strong>AI-native designer</strong> — a designer who uses AI as a collaborator in their core workflow, not just for one-off tasks.</li>
+        <li><strong>AI-native builder</strong> — someone who uses AI as a collaborator in their core workflow, not just for one-off tasks.</li>
         <li><strong>Agent</strong> — an AI that can take actions (read files, call APIs, open PRs) not just generate text. Covered in depth in Lessons 5–9.</li>
         <li><strong>MCP</strong> — Model Context Protocol. A standard that lets Claude talk to external tools like Figma, GitHub, and Vercel. Covered in Lesson 8.</li>
         <li><strong>Intent</strong> — a clear description of the goal and constraints you give an agent, so it can make good decisions without you micromanaging every step.</li>
@@ -40,7 +40,7 @@ const Lesson1 = ({ onNavigate }) => (
 
     <section>
       <h3>The shape of the new toolkit</h3>
-      <p>Three layers are converging into a designer's daily workflow:</p>
+      <p>Three layers are converging into a builder's daily workflow:</p>
       <AgentDiagram kind="mcp-bus" />
       <p style={{ marginTop: 16 }}>
         At the top — <strong>a host</strong> that talks to you (Claude Desktop, Claude Code). In the middle — <strong>a protocol</strong> that lets that host call any tool (MCP). At the bottom — <strong>your existing tools</strong>, now reachable by language. Once you see this picture, every other lesson is a footnote.
@@ -62,7 +62,7 @@ const Lesson1 = ({ onNavigate }) => (
       },
       {
         label: "Intermediate",
-        question: "Which of these best describes the designer's new role?",
+        question: "Which of these best describes the builder's new role?",
         options: [
           "Replace engineers and ship code yourself",
           "Direct agents — describe intent, supply taste, verify output",
@@ -74,7 +74,7 @@ const Lesson1 = ({ onNavigate }) => (
       },
       {
         label: "Advanced",
-        question: "An agent ships a feature the designer didn't anticipate. What systemic practice best prevents repeated surprises?",
+        question: "An agent ships a feature the builder didn't anticipate. What systemic practice best prevents repeated surprises?",
         options: [
           "Add more rules to the system prompt",
           "Review agent traces and encode successful patterns as Skills",
@@ -268,7 +268,7 @@ const Lesson3 = () => (
     <div className="eyebrow">Tools</div>
     <h1 style={{ marginTop: 14, marginBottom: 18 }}>Claude Code — pair-coding without code</h1>
     <p className="lede">
-      Claude Code is a terminal-native agent. You point it at a folder, describe an outcome, and it reads, edits, runs, and commits. For designers, it's the bridge from a Figma idea to a working prototype URL — without translating to engineer.
+      Claude Code is a terminal-native agent. You point it at a folder, describe an outcome, and it reads, edits, runs, and commits. For builders, it's the bridge from a Figma idea to a working prototype URL — without translating to engineer.
     </p>
 
     <section>
@@ -372,7 +372,7 @@ const Lesson3 = () => (
         The difference: Project Instructions live in Claude Desktop and shape your <em>conversations</em>. CLAUDE.md lives in your repo and shapes Code's <em>actions</em> on that codebase.
       </p>
       <CodeBlock filename="CLAUDE.md" lang="md">
-{`# AI-Native Designer 101 — course repo
+{`# AI-Native Builder — course repo
 
 ## Tech stack
 React 18 via CDN (no build step). JSX transpiled by Babel standalone.
@@ -397,7 +397,7 @@ No npm run dev. No build step. Changes are live on page reload.
 
 ## Don't touch
 - The CDN integrity hashes in index.html — leave them as-is.
-- The STORAGE_KEY "ai-native-designer-101::v2" in app.jsx.`}
+- The STORAGE_KEY "ai-native-builder::v2" in app.jsx.`}
       </CodeBlock>
       <Callout kind="do" title="Write CLAUDE.md before writing any prompt to Claude Code">
         Without it, Claude Code makes sensible-but-wrong decisions — using a package manager that doesn't apply, assuming a build step that doesn't exist, choosing file paths that break imports. CLAUDE.md is 5 minutes that saves an hour of correction.

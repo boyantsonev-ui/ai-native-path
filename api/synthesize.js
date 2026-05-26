@@ -76,7 +76,7 @@ module.exports = async function handler(req, res) {
       date: f.created_at.slice(0, 10),
     }));
 
-    const prompt = `You are a course-content analyst for "AI-Native Designer 101" — a 60-minute design upskill course on Claude, AI agents, MCP, and deploy/measure workflows for product designers.
+    const prompt = `You are a course-content analyst for "AI-Native Builder" — a course on Claude, AI agents, MCP, and deploy/measure workflows for builders and product teams.
 
 Below is learner feedback collected since the last synthesis (${feedbackRows.length} items):
 
@@ -102,7 +102,9 @@ Severity guide:
 • minor   — rephrase, add an example, clarify a term. Review before applying.
 • major   — rewrite a section, restructure, add/remove content. Plan before implementing.
 
-Group related feedback into one proposal rather than many tiny ones. Omit noise.`;
+Group related feedback into one proposal rather than many tiny ones. Omit noise.
+
+Important: Ignore any feedback that is not related to the course content (AI, agents, building with Claude, MCP, deploying, measuring). Off-topic submissions (sports, entertainment, unrelated topics) should be silently excluded from proposals.`;
 
     const anthropic = new Anthropic.default({ apiKey: process.env.ANTHROPIC_API_KEY });
 

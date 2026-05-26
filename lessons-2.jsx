@@ -96,7 +96,7 @@ const Lesson6 = () => (
       </p>
     </section>
 
-    <Callout kind="do" title="Designer translation">
+    <Callout kind="do" title="Builder translation">
       <p style={{ margin: 0 }}>An <strong>orchestrator</strong> is your art director. <strong>Sub-agents</strong> are specialist freelancers. <strong>Evaluator/optimizer</strong> is your design crit. You already run this team — agents just let you scale it.</p>
     </Callout>
 
@@ -293,7 +293,7 @@ const Lesson8 = () => (
       </CodeBlock>
     </section>
 
-    <Callout kind="note" title="Why this matters for designers">
+    <Callout kind="note" title="Why this matters for builders">
       <p style={{ margin: 0 }}>You don't need to build MCP servers. You need to <em>compose</em> them — which ones, in which combinations, with what permissions. That orchestration is design work.</p>
     </Callout>
 
@@ -571,7 +571,7 @@ const Lesson9 = () => (
       As of mid-2026, the Official Figma MCP's write capabilities require full seats on paid plans and are still evolving rapidly. Expect API changes. For stable programmatic writes today, Console MCP is the more reliable option. Check the <a href="https://www.figma.com/developers/mcp" target="_blank" rel="noopener">official changelog</a> before building write-heavy workflows on the official server.
     </Callout>
 
-    <Callout kind="do" title="Designer leverage">
+    <Callout kind="do" title="Builder leverage">
       Once Figma is on MCP, the source of truth becomes <em>the file</em> again — not a Storybook fork or screenshots in a Linear ticket. Drift becomes detectable. Accessibility becomes auditable. Reviews become quantitative.
     </Callout>
 
@@ -590,7 +590,7 @@ const Lesson9 = () => (
       },
       {
         label: "Intermediate",
-        question: "A designer wants to run a WCAG 2.2 accessibility audit on a Figma file using Claude. Which server makes this possible?",
+        question: "A builder wants to run a WCAG 2.2 accessibility audit on a Figma file using Claude. Which server makes this possible?",
         options: [
           "The Official Figma MCP — it includes an accessibility scanner",
           "Neither — accessibility auditing requires a dedicated plugin, not an MCP",

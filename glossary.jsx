@@ -84,7 +84,7 @@ function CheatSheetModal({ onClose }) {
         <div className="modal-head">
           <div>
             <div className="eyebrow">Take it with you</div>
-            <h3 style={{ marginTop: 6 }}>Cheat sheet · AI-Native Designer 101</h3>
+            <h3 style={{ marginTop: 6 }}>Cheat sheet · AI-Native Builder</h3>
           </div>
           <div style={{ display: "flex", gap: 8 }}>
             <button className="btn" onClick={print}>Print / save PDF</button>
