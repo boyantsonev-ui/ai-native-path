@@ -328,11 +328,11 @@ const Lesson3 = () => (
         </div>
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16, fontSize: 14 }}>
+      <table>
         <thead>
-          <tr style={{ borderBottom: "1px solid var(--border)" }}>
-            <th style={{ textAlign: "left", padding: "6px 12px 6px 0", color: "var(--text-2)" }}>Situation</th>
-            <th style={{ textAlign: "left", padding: "6px 0", color: "var(--text-2)" }}>Command</th>
+          <tr>
+            <th>Situation</th>
+            <th>Command</th>
           </tr>
         </thead>
         <tbody>
@@ -342,9 +342,9 @@ const Lesson3 = () => (
             ["Want to pick up an old session", "/resume"],
             ["Curious how full your context is", "/context"],
           ].map(([situation, cmd]) => (
-            <tr key={cmd} style={{ borderBottom: "1px solid var(--border-subtle, var(--border))" }}>
-              <td style={{ padding: "8px 12px 8px 0", color: "var(--text-1)" }}>{situation}</td>
-              <td style={{ padding: "8px 0" }}><code>{cmd}</code></td>
+            <tr key={cmd}>
+              <td>{situation}</td>
+              <td><code>{cmd}</code></td>
             </tr>
           ))}
         </tbody>
@@ -573,12 +573,12 @@ See \`examples/before-after.md\` for the bar.`}
         </div>
       </div>
 
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: 16, fontSize: 14 }}>
+      <table>
         <thead>
-          <tr style={{ borderBottom: "1px solid var(--border)" }}>
-            <th style={{ textAlign: "left", padding: "6px 12px 6px 0", color: "var(--text-2)" }}></th>
-            <th style={{ textAlign: "left", padding: "6px 12px", color: "var(--text-2)" }}>Claude Code</th>
-            <th style={{ textAlign: "left", padding: "6px 0", color: "var(--text-2)" }}>Claude.ai</th>
+          <tr>
+            <th></th>
+            <th>Claude Code</th>
+            <th>Claude.ai</th>
           </tr>
         </thead>
         <tbody>
@@ -589,10 +589,10 @@ See \`examples/before-after.md\` for the bar.`}
             ["Extras", "Subagent execution, invocation control", "Partner skills (Figma, Notion, Atlassian)"],
             ["Scope", "Personal, project, or enterprise hierarchy", "Personal, team, or org-wide"],
           ].map(([label, code, web]) => (
-            <tr key={label} style={{ borderBottom: "1px solid var(--border-subtle, var(--border))" }}>
-              <td style={{ padding: "8px 12px 8px 0", color: "var(--text-2)", fontWeight: 500 }}>{label}</td>
-              <td style={{ padding: "8px 12px", color: "var(--text-1)" }}>{code}</td>
-              <td style={{ padding: "8px 0", color: "var(--text-1)" }}>{web}</td>
+            <tr key={label}>
+              <td style={{ fontWeight: 500 }}>{label}</td>
+              <td>{code}</td>
+              <td>{web}</td>
             </tr>
           ))}
         </tbody>

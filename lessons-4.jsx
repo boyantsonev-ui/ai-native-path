@@ -184,7 +184,7 @@ const Lesson13 = () => (
 
     <div style={{ textAlign: "center", marginTop: 60, paddingTop: 40, borderTop: "1px solid var(--rule)" }}>
       <div className="eyebrow" style={{ justifyContent: "center", display: "inline-flex" }}>End of course</div>
-      <p style={{ fontFamily: "var(--serif)", fontSize: 24, marginTop: 18, color: "var(--ink)" }}>
+      <p className="lede" style={{ marginTop: 18 }}>
         Now go ship something a builder couldn't ship a year ago.
       </p>
     </div>
