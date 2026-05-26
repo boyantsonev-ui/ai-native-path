@@ -1326,6 +1326,9 @@ a { color: var(--clay-deep); text-decoration: underline; text-decoration-thickne
   flex: 1; justify-content: center;
   gap: 6px; font-size: 12px;
 }
+.header-actions .auth-btn {
+  flex: none;
+}
 .auth-btn--signed-in {
   position: relative;
 }
