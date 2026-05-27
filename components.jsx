@@ -639,20 +639,20 @@ function AgentLoop() {
       <div className="diagram-title">Agent — autonomous tool-use loop</div>
       <svg viewBox="0 0 720 240" width="100%">
         <g fontFamily="var(--sans)" fontSize="11">
-          <circle cx="360" cy="120" r="56" fill="#1F1E1B" />
-          <text x="360" y="116" textAnchor="middle" fill="#F0EBDF" fontWeight="500">Agent</text>
-          <text x="360" y="132" textAnchor="middle" fill="#DED3BC" fontSize="10" fontFamily="var(--mono)">think → act → observe</text>
-
-          {/* Edges first — so nodes render on top */}
+          {/* 1. Edges behind everything */}
           {[
-            { x: 90, y: 50, label: "Read file" },
-            { x: 90, y: 190, label: "Run command" },
-            { x: 560, y: 50, label: "Edit file" },
-            { x: 560, y: 190, label: "Search web" },
+            { x: 90, y: 50 },
+            { x: 90, y: 190 },
+            { x: 560, y: 50 },
+            { x: 560, y: 190 },
           ].map((t, i) => (
             <path key={i} className="arrow dim" d={`M${t.x + 60} ${t.y} Q ${(t.x + 360)/2} ${(t.y + 120)/2 - 20} 360 120`} />
           ))}
-          {/* Nodes on top */}
+          {/* 2. Center node on top of edges */}
+          <circle cx="360" cy="120" r="66" fill="#1F1E1B" />
+          <text x="360" y="116" textAnchor="middle" fill="#F0EBDF" fontWeight="500">Agent</text>
+          <text x="360" y="132" textAnchor="middle" fill="#DED3BC" fontSize="10" fontFamily="var(--mono)">think → act → observe</text>
+          {/* 3. Outer tool nodes on top of edges */}
           {[
             { x: 90, y: 50, label: "Read file" },
             { x: 90, y: 190, label: "Run command" },

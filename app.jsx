@@ -158,11 +158,28 @@ function App() {
   // Subscribe to Supabase auth changes; merge remote progress on sign-in
   useEffect(() => {
     if (!window.__supabase) return;
+
+    // Immediately hydrate user from existing session (covers post-OAuth redirect)
+    window.__supabase.auth.getSession().then(async ({ data: { session } }) => {
+      const u = session?.user || null;
+      setUser(u);
+      if (u) {
+        try {
+          const { data } = await window.__supabase
+            .from("user_progress")
+            .select("*")
+            .eq("user_id", u.id)
+            .single();
+          if (data) setState(local => mergeProgress(local, data));
+        } catch {}
+      }
+    });
+
     const { data: { subscription } } = window.__supabase.auth.onAuthStateChange(
       async (event, session) => {
         const u = session?.user || null;
         setUser(u);
-        if (u && (event === "SIGNED_IN" || event === "INITIAL_SESSION")) {
+        if (u && event === "SIGNED_IN") {
           try {
             const { data } = await window.__supabase
               .from("user_progress")
@@ -254,7 +271,7 @@ function App() {
             <div className="brand-mark">
               <div className="brand-logo">A</div>
               <div>
-                <div className="brand-title">AI-Native Builder</div>
+                <div className="brand-title">AI-Native Path</div>
                 <div className="brand-sub">A living course that teaches itself</div>
               </div>
             </div>
@@ -326,6 +343,7 @@ function App() {
             </div>
             <div className="header-actions">
               <button className="btn btn-ghost" onClick={() => setOpenGloss(true)}>Glossary</button>
+              <AuthButton user={user} />
             </div>
           </div>
 
