@@ -144,7 +144,7 @@ a { color: var(--clay-deep); text-decoration: underline; text-decoration-thickne
 .lessons-list::before {
   content: "";
   position: absolute;
-  left: 27px;
+  left: 29px;
   top: 0; bottom: 0;
   width: 2px;
   background: var(--rule);
