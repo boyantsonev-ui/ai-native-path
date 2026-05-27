@@ -271,7 +271,7 @@ function App() {
             <div className="brand-mark">
               <div className="brand-logo">A</div>
               <div>
-                <div className="brand-title">AI-Native Builder</div>
+                <div className="brand-title">AI-Native Path</div>
                 <div className="brand-sub">A living course that teaches itself</div>
               </div>
             </div>
