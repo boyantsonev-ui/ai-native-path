@@ -3,7 +3,7 @@
 const Lesson5 = () => (
   <>
     <div className="eyebrow">Foundations</div>
-    <h1 style={{ marginTop: 14, marginBottom: 18 }}>Agents — what Anthropic actually means</h1>
+    <h1 style={{ marginTop: 14, marginBottom: 18 }}>Agents — what the term actually means</h1>
     <p className="lede">
       "Agent" is the most overloaded word in tech. Anthropic's research <em>Building effective agents</em> draws a clean line: <strong>workflows</strong> are LLMs orchestrated by code. <strong>Agents</strong> are LLMs that orchestrate themselves. Both are useful — knowing which you need is the skill.
     </p>

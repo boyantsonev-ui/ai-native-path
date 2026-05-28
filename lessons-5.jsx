@@ -37,7 +37,7 @@ function Lesson14() {
         <div className="cheat-card" style={{ marginTop: 16 }}>
 
           <div className="cc-item">
-            <div className="eyebrow">Augmented LLM · Agents — what Anthropic means</div>
+            <div className="eyebrow">Augmented LLM · Agents — what the term means</div>
             <h4>Supabase + /api/synthesize</h4>
             <p>
               The synthesis function is an LLM (Claude API) augmented with external memory — Supabase stores the feedback it reads and the proposals it writes. That's the Augmented LLM pattern: model + retrieval + memory + tools.
