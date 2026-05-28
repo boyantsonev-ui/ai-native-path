@@ -774,7 +774,162 @@ function AuthButton({ user }) {
   );
 }
 
+// ---------- Tier system (single tier for now; extend by adding entries) ----------
+const TIERS = [
+  { label: "Builder", minPoints: 0, icon: "◆" },
+];
+function getTier(points) {
+  for (let i = TIERS.length - 1; i >= 0; i--) {
+    if (points >= TIERS[i].minPoints) return TIERS[i];
+  }
+  return TIERS[0];
+}
+
+// ---------- Profile block (sidebar) ----------
+function ProfileBlock({ user, points, onViewLeaderboard, onSignOut }) {
+  const [leaderboard, setLeaderboard] = React.useState([]);
+  const [myRank, setMyRank]           = React.useState(null);
+  const tier   = getTier(points);
+  const name   = user?.user_metadata?.full_name || user?.email?.split("@")[0] || null;
+  const avatar = user?.user_metadata?.avatar_url;
+
+  React.useEffect(() => {
+    if (!window.__supabase) return;
+    window.__supabase.rpc("get_leaderboard", { limit_n: 5 })
+      .then(({ data }) => {
+        if (!data) return;
+        setLeaderboard(data);
+        const me = data.find(r => r.is_current_user);
+        if (me) setMyRank(me.rank);
+      })
+      .catch(() => {});
+  }, [user?.id, points]);
+
+  const top3    = leaderboard.slice(0, 3);
+  const meRow   = leaderboard.find(r => r.is_current_user);
+  const showMe  = myRank > 3 && meRow;
+
+  return (
+    <div className="profile-block">
+      <div className="profile-identity">
+        <div className="profile-avatar">
+          {avatar
+            ? <img src={avatar} alt="" className="profile-avatar-img" />
+            : <span className="profile-avatar-initials">{name ? name[0].toUpperCase() : "?"}</span>
+          }
+        </div>
+        <div className="profile-meta">
+          <div className="profile-name">{name || "Guest"}</div>
+          <div className="profile-tier">
+            <span className="profile-tier-icon">{tier.icon}</span>
+            <span>{tier.label}</span>
+          </div>
+        </div>
+        <div className="profile-pts">
+          <div className="profile-pts-value">{points}</div>
+          <div className="profile-pts-label">pts</div>
+        </div>
+        {user && onSignOut && (
+          <button className="profile-signout" onClick={onSignOut} title="Sign out">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
+        )}
+      </div>
+
+      <div className="mini-leaderboard">
+        {leaderboard.length === 0 ? (
+          <div className="mini-lb-empty">
+            {!window.__supabase ? "No leaderboard" : "No scores yet"}
+          </div>
+        ) : (
+          <>
+            {top3.map(row => (
+              <div key={row.rank} className={"mini-lb-row" + (row.is_current_user ? " mini-lb-me" : "")}>
+                <span className="mini-lb-rank">#{row.rank}</span>
+                <span className="mini-lb-name">{row.display_name}</span>
+                <span className="mini-lb-score">{row.points}</span>
+              </div>
+            ))}
+            {showMe && (
+              <>
+                <div className="mini-lb-ellipsis">···</div>
+                <div className="mini-lb-row mini-lb-me">
+                  <span className="mini-lb-rank">#{meRow.rank}</span>
+                  <span className="mini-lb-name">{meRow.display_name}</span>
+                  <span className="mini-lb-score">{meRow.points}</span>
+                </div>
+              </>
+            )}
+          </>
+        )}
+        {!user && window.__supabase && (
+          <div className="mini-lb-signin">Sign in to appear here</div>
+        )}
+      </div>
+
+      <button className="mini-lb-link btn btn-ghost" onClick={onViewLeaderboard}>
+        Full leaderboard →
+      </button>
+    </div>
+  );
+}
+
+// ---------- Leaderboard page ----------
+function LeaderboardPage({ user, onBack }) {
+  const [rows,    setRows]    = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!window.__supabase) { setLoading(false); return; }
+    window.__supabase.rpc("get_leaderboard", { limit_n: 50 })
+      .then(({ data }) => { setRows(data || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, [user?.id]);
+
+  return (
+    <div className="leaderboard-page">
+      <div className="leaderboard-inner">
+        <div className="leaderboard-head">
+          <button className="btn btn-ghost" onClick={onBack}>← Back</button>
+          <h2 style={{ margin: 0 }}>Leaderboard</h2>
+        </div>
+
+        {loading ? (
+          <div className="lb-empty">Loading…</div>
+        ) : rows.length === 0 ? (
+          <div className="lb-empty">
+            {!window.__supabase ? "Auth not configured." : "No scores yet — complete a quiz to appear here!"}
+          </div>
+        ) : (
+          <div className="lb-list">
+            {rows.map(row => (
+              <div key={row.rank} className={"lb-row" + (row.is_current_user ? " lb-row--me" : "")}>
+                <span className="lb-rank">
+                  {row.rank <= 3
+                    ? ["◆", "◈", "◇"][row.rank - 1]
+                    : `#${row.rank}`}
+                </span>
+                <span className="lb-name">{row.display_name}</span>
+                <span className="lb-score">{row.points} pts</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!user && window.__supabase && (
+          <p className="lb-signin-nudge">Sign in with Google to save your score and appear here.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 Object.assign(window, {
   CodeBlock, CodeTabs, Callout, Quiz, QuizTiered, Terminal, ChatMock, TryIt, Steps,
   AgentDiagram, HeroCard, useInView, CourseOrchestrator, AuthButton,
+  ProfileBlock, LeaderboardPage,
 });

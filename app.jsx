@@ -106,6 +106,7 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pointsFlash, setPointsFlash] = useState(null); // { amount, ts }
   const [user,        setUser]        = useState(null);  // Supabase auth user
+  const [view,        setView]        = useState("lesson"); // "lesson" | "leaderboard"
   const flashTimer = useRef(null);
   const syncTimer  = useRef(null);
   const mainRef    = useRef(null);
@@ -209,6 +210,7 @@ function App() {
           completed_lessons: state.completed     || [],
           points:            state.points        || 0,
           earned_quizzes:    state.earnedQuizzes || {},
+          display_name:      user.user_metadata?.full_name || user.email?.split("@")[0] || null,
           updated_at:        new Date().toISOString(),
         });
       } catch {}
@@ -225,6 +227,7 @@ function App() {
         ? s.visited
         : [...(s.visited || []), s.current],
     }));
+    setView("lesson");
     setSidebarOpen(false);
   };
 
@@ -280,21 +283,12 @@ function App() {
             </div>
           </div>
 
-          <div className="progress-block">
-            <div className="progress-row">
-              <span className="mono">PROGRESS</span>
-              <span className="mono">{reached} / {FLAT.length} · {pct}%</span>
-            </div>
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: pct + "%" }} />
-            </div>
-            {points > 0 && (
-              <div className="points-badge">
-                <span className="points-diamond">◆</span>
-                <span>{points} pts</span>
-              </div>
-            )}
-          </div>
+          <ProfileBlock
+            user={user}
+            points={points}
+            onViewLeaderboard={() => { setView("leaderboard"); setSidebarOpen(false); }}
+            onSignOut={() => window.__supabase?.auth.signOut()}
+          />
 
           <div className="lessons-list">
             {LESSONS.map((group, gi) => (
@@ -342,7 +336,7 @@ function App() {
                   : <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="1" y="1" width="6" height="16" rx="2" stroke="currentColor" strokeWidth="1.4"/><rect x="9" y="4" width="8" height="1.4" rx=".7" fill="currentColor"/><rect x="9" y="8.3" width="8" height="1.4" rx=".7" fill="currentColor"/><rect x="9" y="12.6" width="8" height="1.4" rx=".7" fill="currentColor"/></svg>
                 }
               </button>
-              <strong>{current.title}</strong>
+              <strong>{view === "leaderboard" ? "Leaderboard" : current.title}</strong>
             </div>
             <div className="header-actions">
               <button className="btn btn-ghost" onClick={() => setOpenGloss(true)}>Glossary</button>
@@ -350,50 +344,56 @@ function App() {
             </div>
           </div>
 
-          {/* Quiz nudge — shown when lesson visited but quiz not yet answered */}
-          {showQuizNudge && (
-            <div className="quiz-nudge">
-              <span className="quiz-nudge-icon">◇</span>
-              Answer the quiz in this lesson to mark it complete and earn points.
-            </div>
+          {view === "leaderboard" ? (
+            <LeaderboardPage user={user} onBack={() => setView("lesson")} />
+          ) : (
+            <>
+              {/* Quiz nudge — shown when lesson visited but quiz not yet answered */}
+              {showQuizNudge && (
+                <div className="quiz-nudge">
+                  <span className="quiz-nudge-icon">◇</span>
+                  Answer the quiz in this lesson to mark it complete and earn points.
+                </div>
+              )}
+
+              {/* Lesson content — wrapped in LessonContext for quiz→app signalling */}
+              <div className="lesson" key={current.id}>
+                <LessonContext.Provider value={{ lessonId: current.id, markComplete }}>
+                  <Comp onNavigate={goTo} />
+                </LessonContext.Provider>
+              </div>
+
+              {/* ── Per-lesson feedback panel ── */}
+              <div className="fp-outer">
+                <FeedbackPanel
+                  key={current.id}
+                  lessonId={current.id}
+                  lessonTitle={current.title}
+                />
+              </div>
+
+              {/* Prev / Next pager */}
+              <div className="pager">
+                {prev ? (
+                  <div className="pager-card" onClick={() => goTo(prev.id)}>
+                    <span className="mono">← PREVIOUS</span>
+                    <div className="title">{prev.title}</div>
+                  </div>
+                ) : <div />}
+                {next ? (
+                  <div className="pager-card next" onClick={() => goTo(next.id)}>
+                    <span className="mono">NEXT →</span>
+                    <div className="title">{next.title}</div>
+                  </div>
+                ) : (
+                  <div className="pager-card next">
+                    <span className="mono">FINISH ✓</span>
+                    <div className="title">You've completed the course — well done.</div>
+                  </div>
+                )}
+              </div>
+            </>
           )}
-
-          {/* Lesson content — wrapped in LessonContext for quiz→app signalling */}
-          <div className="lesson" key={current.id}>
-            <LessonContext.Provider value={{ lessonId: current.id, markComplete }}>
-              <Comp onNavigate={goTo} />
-            </LessonContext.Provider>
-          </div>
-
-          {/* ── Per-lesson feedback panel ── */}
-          <div className="fp-outer">
-            <FeedbackPanel
-              key={current.id}
-              lessonId={current.id}
-              lessonTitle={current.title}
-            />
-          </div>
-
-          {/* Prev / Next pager */}
-          <div className="pager">
-            {prev ? (
-              <div className="pager-card" onClick={() => goTo(prev.id)}>
-                <span className="mono">← PREVIOUS</span>
-                <div className="title">{prev.title}</div>
-              </div>
-            ) : <div />}
-            {next ? (
-              <div className="pager-card next" onClick={() => goTo(next.id)}>
-                <span className="mono">NEXT →</span>
-                <div className="title">{next.title}</div>
-              </div>
-            ) : (
-              <div className="pager-card next">
-                <span className="mono">FINISH ✓</span>
-                <div className="title">You've completed the course — well done.</div>
-              </div>
-            )}
-          </div>
         </main>
       </div>
 
