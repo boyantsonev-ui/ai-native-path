@@ -1368,3 +1368,149 @@ a { color: var(--clay-deep); text-decoration: underline; text-decoration-thickne
   margin-left: auto;
   title: "Progress synced";
 }
+
+/* ── Profile block (replaces progress block) ── */
+.profile-block {
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.profile-identity {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+  width: 34px; height: 34px; border-radius: 50%;
+  overflow: hidden;
+}
+.profile-avatar-img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.profile-avatar-initials {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--clay); color: white;
+  font-size: 14px; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+
+.profile-meta { flex: 1; min-width: 0; }
+.profile-name {
+  font-size: 13px; font-weight: 500; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.profile-tier {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase;
+  color: var(--amber); margin-top: 2px; font-family: var(--mono);
+}
+.profile-tier-icon { font-size: 7px; }
+
+.profile-pts {
+  text-align: right; flex-shrink: 0;
+}
+.profile-pts-value {
+  font-family: var(--mono); font-size: 18px; font-weight: 600;
+  color: var(--ink); line-height: 1;
+}
+.profile-pts-label {
+  font-family: var(--mono); font-size: 9px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-4); margin-top: 2px;
+}
+
+/* ── Mini leaderboard ── */
+.mini-leaderboard {
+  display: flex; flex-direction: column; gap: 2px;
+  margin-bottom: 10px;
+}
+.mini-lb-row {
+  display: flex; align-items: center; gap: 6px;
+  padding: 4px 6px; border-radius: 5px;
+  font-size: 11px; color: var(--ink-2);
+}
+.mini-lb-row.mini-lb-me {
+  background: rgba(204, 120, 92, 0.08);
+  color: var(--ink);
+  font-weight: 500;
+}
+.mini-lb-rank {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--ink-4); flex-shrink: 0; width: 22px;
+}
+.mini-lb-me .mini-lb-rank { color: var(--clay); }
+.mini-lb-name {
+  flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mini-lb-score {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--ink-3); flex-shrink: 0;
+}
+.mini-lb-me .mini-lb-score { color: var(--clay); }
+.mini-lb-ellipsis {
+  font-size: 10px; color: var(--ink-4);
+  text-align: center; letter-spacing: 3px; padding: 1px 0;
+}
+.mini-lb-empty, .mini-lb-signin {
+  font-size: 11px; color: var(--ink-4); padding: 4px 6px;
+  font-style: italic;
+}
+.mini-lb-link {
+  width: 100%; justify-content: center;
+  font-size: 11px; padding: 4px 8px;
+}
+
+/* ── Leaderboard page ── */
+.leaderboard-page {
+  max-width: 860px; margin: 0 auto;
+  padding: 56px 36px 120px;
+}
+.leaderboard-inner { max-width: 540px; }
+.leaderboard-head {
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 32px;
+}
+
+.lb-list {
+  display: flex; flex-direction: column; gap: 0;
+  border: 1px solid var(--rule); border-radius: 10px; overflow: hidden;
+}
+.lb-row {
+  display: flex; align-items: center; gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 14px; color: var(--ink-2);
+  transition: background 0.12s;
+}
+.lb-row:last-child { border-bottom: none; }
+.lb-row--me {
+  background: rgba(204, 120, 92, 0.07);
+  color: var(--ink); font-weight: 500;
+}
+.lb-rank {
+  font-family: var(--mono); font-size: 13px;
+  color: var(--ink-4); flex-shrink: 0; width: 28px;
+  text-align: center;
+}
+.lb-row:nth-child(1) .lb-rank { color: var(--amber); }
+.lb-row:nth-child(2) .lb-rank { color: var(--ink-3); }
+.lb-row:nth-child(3) .lb-rank { color: var(--clay); }
+.lb-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-score {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--ink-3); flex-shrink: 0;
+}
+.lb-row--me .lb-score { color: var(--clay); }
+.lb-empty {
+  padding: 48px 0; text-align: center;
+  color: var(--ink-4); font-size: 14px; font-style: italic;
+}
+.lb-signin-nudge {
+  margin-top: 24px; padding: 14px 18px;
+  background: var(--paper-2); border: 1px solid var(--rule);
+  border-radius: 8px; font-size: 13px; color: var(--ink-3);
+}
+
+@media (max-width: 640px) {
+  .leaderboard-page { padding: 32px 20px 80px; }
+}
