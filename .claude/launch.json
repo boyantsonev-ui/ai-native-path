@@ -5,8 +5,7 @@
       "name": "ai-native-path",
       "runtimeExecutable": "npx",
       "runtimeArgs": ["serve", "."],
-      "port": 4200,
-      "autoPort": true
+      "port": 4200
     }
   ]
 }
