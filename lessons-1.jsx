@@ -5,12 +5,16 @@ const Lesson1 = ({ onNavigate }) => (
     <HeroCard
       eyebrow="Course"
       title="The future of builders."
-      lede="You'll go from clicking buttons in Figma to orchestrating agents that build, deploy, and measure your prototypes — in your own voice."
+      lede="Software is being democratised. Anyone with intent and taste — engineers, marketers, PMs, founders, operators — can now prototype, ship, and measure. This course teaches the stack."
       meta={["14 lessons", "Mixed / hands-on", "Updated May 2026"]}
     />
 
+    <Callout kind="note" title="An experiment, not a replacement.">
+      This course is itself an applied-research project. It doesn't aim to replace quality software engineering or handcrafted design — it builds <em>on top of</em> them. AI-native building is a layer for exploration, prototyping, and learning. Production craft still matters.
+    </Callout>
+
     <p className="lede">
-      Design used to mean static frames handed to engineers. Today, an AI-native builder is a <em>director</em> — they describe intent, supply taste, and let agents do the production. This course teaches you the stack.
+      For decades, shipping software meant a specialised team. That barrier is collapsing. An engineer, a marketer, a PM, a founder can now go from idea → working prototype → measured signal in a single afternoon. The skill isn't replacing professionals — it's joining the conversation by describing intent clearly and judging output sharply.
     </p>
 
     <Callout kind="tip" title="New to these terms?">
@@ -44,6 +48,22 @@ const Lesson1 = ({ onNavigate }) => (
       <AgentDiagram kind="mcp-bus" />
       <p style={{ marginTop: 16 }}>
         At the top — <strong>a host</strong> that talks to you (Claude Desktop, Claude Code). In the middle — <strong>a protocol</strong> that lets that host call any tool (MCP). At the bottom — <strong>your existing tools</strong>, now reachable by language. Once you see this picture, every other lesson is a footnote.
+      </p>
+    </section>
+
+    <section>
+      <h3>What people actually build with this</h3>
+      <p>This skillset isn't tied to a role — it's a way to turn intent into something you can poke at. A few shapes it takes:</p>
+      <div className="two-col">
+        <div className="cheat-card"><h5>Engineers</h5><p>Spike a feature as a working prototype before committing to the production design.</p></div>
+        <div className="cheat-card"><h5>Marketers</h5><p>Stand up a landing-page variant in an hour and measure it against the control.</p></div>
+        <div className="cheat-card"><h5>PMs</h5><p>Turn a Figma flow into a clickable thing customers can react to in user interviews.</p></div>
+        <div className="cheat-card"><h5>Founders</h5><p>Validate a hypothesis end-to-end — UI, data, signal — before hiring the team.</p></div>
+        <div className="cheat-card"><h5>Researchers</h5><p>Convert interview notes into an interactive demo that surfaces the patterns.</p></div>
+        <div className="cheat-card"><h5>Operators</h5><p>Automate a manual workflow without booking engineering time.</p></div>
+      </div>
+      <p style={{ marginTop: 16 }}>
+        Every card is the same shape underneath: <strong>describe intent → ship a small thing → measure what happened → learn</strong>. That loop is the actual unlock. The tools change; the loop is the practice.
       </p>
     </section>
 
