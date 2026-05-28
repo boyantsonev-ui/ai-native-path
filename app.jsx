@@ -318,7 +318,7 @@ function App() {
 
           <div className="sidebar-foot">
             <button className="btn" onClick={() => setOpenGloss(true)}>Glossary</button>
-            <AuthButton user={user} />
+            {!user && <AuthButton user={user} />}
           </div>
         </aside>
 
@@ -338,10 +338,7 @@ function App() {
               </button>
               <strong>{view === "leaderboard" ? "Leaderboard" : current.title}</strong>
             </div>
-            <div className="header-actions">
-              <button className="btn btn-ghost" onClick={() => setOpenGloss(true)}>Glossary</button>
-              <AuthButton user={user} />
-            </div>
+            <div className="header-actions" />
           </div>
 
           {view === "leaderboard" ? (
