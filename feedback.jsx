@@ -6,8 +6,8 @@
 // Data layer
 // ─────────────────────────────────────────────────────────────────────────────
 
-const FB_KEY    = "ai-native-builder::feedback::v1";
-const SYNTH_KEY = "ai-native-builder::synthesis::v1";
+const FB_KEY    = "ai-native-path::feedback::v1";
+const SYNTH_KEY = "ai-native-path::synthesis::v1";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Content guardrails
@@ -458,7 +458,7 @@ function HITLCard({ proposal, onApprove, onDismiss, onApplyAuto, applyBusy }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ADMIN_HASH    = "8ae0ce71a1627cbff3f7bee95c6829ca53d549eb76c440108752d33ad7b51d92";
-const ADMIN_SESSION = "ai-native-builder::admin";
+const ADMIN_SESSION = "ai-native-path::admin";
 
 function AdminGate({ onUnlock, onCancel }) {
   const [pw,    setPw]    = useState("");
@@ -524,7 +524,7 @@ function AdminGate({ onUnlock, onCancel }) {
 // Routine Scheduler — schedule editor for the automations tab
 // ─────────────────────────────────────────────────────────────────────────────
 
-const ROUTINE_SCHED_KEY = "ai-native-builder::routine::v1";
+const ROUTINE_SCHED_KEY = "ai-native-path::routine::v1";
 
 function loadRoutineSettings() {
   try { return JSON.parse(localStorage.getItem(ROUTINE_SCHED_KEY)) || null; } catch { return null; }

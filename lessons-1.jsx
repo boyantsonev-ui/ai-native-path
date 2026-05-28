@@ -397,7 +397,7 @@ No npm run dev. No build step. Changes are live on page reload.
 
 ## Don't touch
 - The CDN integrity hashes in index.html — leave them as-is.
-- The STORAGE_KEY "ai-native-builder::v2" in app.jsx.`}
+- The STORAGE_KEY "ai-native-path::v2" in app.jsx.`}
       </CodeBlock>
       <Callout kind="do" title="Write CLAUDE.md before writing any prompt to Claude Code">
         Without it, Claude Code makes sensible-but-wrong decisions — using a package manager that doesn't apply, assuming a build step that doesn't exist, choosing file paths that break imports. CLAUDE.md is 5 minutes that saves an hour of correction.
