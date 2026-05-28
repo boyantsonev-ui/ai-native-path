@@ -9,35 +9,6 @@
 const FB_KEY    = "ai-native-path::feedback::v1";
 const SYNTH_KEY = "ai-native-path::synthesis::v1";
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Content guardrails
-// ─────────────────────────────────────────────────────────────────────────────
-
-const COURSE_KEYWORDS = [
-  'ai', 'agent', 'claude', 'anthropic', 'mcp', 'figma', 'build', 'builder',
-  'code', 'design', 'tool', 'workflow', 'prompt', 'model', 'api', 'deploy',
-  'supabase', 'vercel', 'context', 'llm', 'token', 'server', 'github',
-  'component', 'prototype', 'product', 'skill', 'lesson', 'learn', 'course',
-  'cursor', 'copilot', 'automation', 'orchestrat', 'schema', 'yaml', 'jsx',
-  'react', 'analytics', 'posthog', 'hotjar', 'clarity',
-];
-
-const WITTY_OFF_TOPIC = [
-  "Great question — but this course is strictly AI-native territory. Ask Claude directly, it probably knows more about that than we do.",
-  "Bold pivot! We're laser-focused on AI, agents, and building here. Try a search engine for everything else.",
-  "We appreciate the curiosity, but the Ask panel is tuned to this course only. For everything else, Claude is one tab away.",
-  "That's outside our lane. This course covers AI tools, agents, MCP, and shipping — ask anything in that space and we're all yours.",
-];
-
-function isOffTopic(text) {
-  if (!text || text.trim().length < 8) return false;
-  const lower = text.toLowerCase();
-  return !COURSE_KEYWORDS.some(kw => lower.includes(kw));
-}
-
-function randomWitty() {
-  return WITTY_OFF_TOPIC[Math.floor(Math.random() * WITTY_OFF_TOPIC.length)];
-}
 
 function loadFeedback()   { try { return JSON.parse(localStorage.getItem(FB_KEY))    || []; } catch { return []; } }
 function saveFeedback(d)  { try { localStorage.setItem(FB_KEY,    JSON.stringify(d)); } catch {} }
@@ -185,44 +156,23 @@ function FeedbackPanel({ lessonId, lessonTitle }) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AskDrawer({ open, onClose, lessonId, lessonTitle }) {
-  const [chatHistory, setChatHistory] = useState([]);
-  const [chatInput,   setChatInput]   = useState("");
-  const [chatBusy,    setChatBusy]    = useState(false);
-  const chatEndRef = useRef(null);
+  const [question,  setQuestion]  = useState("");
+  const [submitted, setSubmitted] = useState(false);
 
-  const sendChat = async () => {
-    const q = chatInput.trim();
-    if (!q || chatBusy) return;
-    setChatInput("");
-    setChatHistory(h => [...h, { role: "user", text: q }]);
-
-    if (isOffTopic(q)) {
-      setChatHistory(h => [...h, { role: "ai", text: randomWitty() }]);
-      return;
-    }
-
-    setChatBusy(true);
-    try {
-      const system = `You are a concise, practical tutor for "AI-Native Builder", a living course about Claude, AI agents, MCP servers, and deploying with GitHub/Vercel — aimed at builders and product teams. The learner is on "${lessonTitle}". Answer in 2–4 sentences max. Use plain language; no jargon without an explanation.`;
-      const r = await window.claude.complete({ messages: [{ role: "user", content: system + "\n\n" + q }] });
-      setChatHistory(h => [...h, { role: "ai", text: r }]);
-      pushFeedback({
-        lessonId, lessonTitle,
-        type: "chat",
-        content: `Q: ${q}\nA: ${r}`,
-        rating: null,
-        sentiment: "neutral",
-      });
-    } catch {
-      setChatHistory(h => [...h, { role: "ai", text: "I'm not reachable right now — but your question has been logged for the course team." }]);
-    } finally {
-      setChatBusy(false);
-    }
+  const submit = () => {
+    const q = question.trim();
+    if (!q) return;
+    pushFeedback({
+      lessonId, lessonTitle,
+      type: "question",
+      content: q,
+      rating: null,
+      sentiment: "neutral",
+    });
+    setSubmitted(true);
   };
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory, chatBusy]);
+  const reset = () => { setQuestion(""); setSubmitted(false); };
 
   return (
     <div className={"ask-drawer" + (open ? " open" : "")}>
@@ -233,37 +183,42 @@ function AskDrawer({ open, onClose, lessonId, lessonTitle }) {
         </div>
         <button className="btn btn-ghost" onClick={onClose}>✕</button>
       </div>
+
       <div className="ask-drawer-body">
-        {chatHistory.length === 0 && (
-          <div className="fp-chat-empty mono">
-            Ask anything — a concept, an example, or "what does X mean here?"
+        {submitted ? (
+          <div className="ask-confirm">
+            <span className="ask-confirm-icon">✓</span>
+            <div>
+              <strong>Question logged.</strong>
+              <p>The course team reviews all questions weekly — common ones get addressed in lessons or added to the FAQ.</p>
+            </div>
+            <button className="btn btn-ghost ask-again" onClick={reset}>Ask another →</button>
           </div>
+        ) : (
+          <>
+            <p className="ask-hint mono">
+              What's unclear, or what do you want to dig into? Questions are reviewed weekly by the course team.
+            </p>
+            <textarea
+              className="ask-textarea"
+              rows={5}
+              placeholder={'e.g. "What\'s the difference between a workflow and an agent?"'}
+              value={question}
+              onChange={e => setQuestion(e.target.value)}
+              autoFocus={open}
+            />
+            <div className="ask-actions">
+              <button
+                className="btn btn-clay"
+                onClick={submit}
+                disabled={!question.trim()}
+              >
+                Submit question →
+              </button>
+              <span className="mono ask-note">Read by the course team · no live AI</span>
+            </div>
+          </>
         )}
-        {chatHistory.map((m, i) => (
-          <div key={i} className={"fp-msg fp-msg-" + m.role}>{m.text}</div>
-        ))}
-        {chatBusy && (
-          <div className="fp-msg fp-msg-ai fp-msg-thinking">
-            <span className="fp-dots"><i /><i /><i /></span>
-          </div>
-        )}
-        <div ref={chatEndRef} />
-      </div>
-      <div className="ask-drawer-input">
-        <input
-          type="text"
-          placeholder="What's unclear, or what do you want to dig into?"
-          value={chatInput}
-          onChange={e => setChatInput(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && sendChat()}
-          disabled={chatBusy}
-          autoComplete="off"
-        />
-        <button
-          className="btn btn-clay fp-send"
-          onClick={sendChat}
-          disabled={chatBusy || !chatInput.trim()}
-        >→</button>
       </div>
     </div>
   );
