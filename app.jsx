@@ -43,8 +43,9 @@ const LESSONS = [
 ];
 
 const FLAT = LESSONS.flatMap(g => g.items);
-const STORAGE_KEY     = "ai-native-builder::v2";
-const STORAGE_KEY_OLD = "ai-native-designer-101::v2";
+const STORAGE_KEY      = "ai-native-path::v2";
+const STORAGE_KEY_OLD  = "ai-native-builder::v2";
+const STORAGE_KEY_OLD2 = "ai-native-designer-101::v2";
 
 // Context shared with Quiz/QuizTiered so they can report correct answers
 const LessonContext = React.createContext(null);
@@ -68,13 +69,15 @@ function loadState() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) return migrateShape(JSON.parse(raw));
-    // One-time migration from old key
-    const legacy = localStorage.getItem(STORAGE_KEY_OLD);
-    if (legacy) {
-      localStorage.removeItem(STORAGE_KEY_OLD);
-      const parsed = migrateShape(JSON.parse(legacy));
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
-      return parsed;
+    // One-time migration from previous keys (newest first)
+    for (const oldKey of [STORAGE_KEY_OLD, STORAGE_KEY_OLD2]) {
+      const legacy = localStorage.getItem(oldKey);
+      if (legacy) {
+        localStorage.removeItem(oldKey);
+        const parsed = migrateShape(JSON.parse(legacy));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(parsed));
+        return parsed;
+      }
     }
   } catch (e) {}
   return { current: 1, visited: [], completed: [], points: 0, earnedQuizzes: {} };
