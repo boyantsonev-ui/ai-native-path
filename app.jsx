@@ -287,6 +287,7 @@ function App() {
             user={user}
             points={points}
             onViewLeaderboard={() => { setView("leaderboard"); setSidebarOpen(false); }}
+            onSignOut={() => window.__supabase?.auth.signOut()}
           />
 
           <div className="lessons-list">

@@ -1407,6 +1407,17 @@ a { color: var(--clay-deep); text-decoration: underline; text-decoration-thickne
 }
 .profile-tier-icon { font-size: 7px; }
 
+.profile-signout {
+  flex-shrink: 0; margin-left: 2px;
+  background: none; border: none; cursor: pointer; padding: 4px;
+  color: var(--ink-4); border-radius: 6px;
+  display: flex; align-items: center;
+  transition: color 0.12s, background 0.12s;
+}
+.profile-signout:hover {
+  color: var(--ink-2); background: var(--ink-tint);
+}
+
 .profile-pts {
   text-align: right; flex-shrink: 0;
 }
