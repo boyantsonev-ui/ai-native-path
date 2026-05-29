@@ -22,7 +22,7 @@ const LESSONS = [
     { id: 4,  title: "Skills", Comp: () => <Lesson4 /> },
   ]},
   { group: "Foundations", items: [
-    { id: 5,  title: "Agents — what Anthropic means", Comp: () => <Lesson5 /> },
+    { id: 5,  title: "Agents — what the term means", Comp: () => <Lesson5 /> },
     { id: 6,  title: "Sub-agents & orchestrators", Comp: () => <Lesson6 /> },
     { id: 7,  title: "Autonomous agents", Comp: () => <Lesson7 /> },
     { id: 15, title: "Context & cost", Comp: () => <Lesson15 /> },
