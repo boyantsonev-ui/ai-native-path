@@ -747,7 +747,7 @@ function AuthButton({ user }) {
         title={`Signed in as ${name} · Click to sign out`}
       >
         {avatar
-          ? <img src={avatar} alt="" className="auth-avatar" />
+          ? <img src={avatar} alt="" className="auth-avatar" referrerPolicy="no-referrer" />
           : <span className="auth-initials">{name[0].toUpperCase()}</span>
         }
         <span className="auth-name">{name.split(" ")[0]}</span>

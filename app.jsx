@@ -9,7 +9,9 @@ if (
   typeof window.supabase !== "undefined" &&
   SUPABASE_URL !== "https://YOUR_PROJECT.supabase.co"
 ) {
-  window.__supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  window.__supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: { flowType: "implicit", detectSessionInUrl: true, persistSession: true },
+  });
 }
 
 const LESSONS = [
