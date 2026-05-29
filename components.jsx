@@ -921,7 +921,10 @@ function LeaderboardPage({ user, onBack }) {
         )}
 
         {!user && window.__supabase && (
-          <p className="lb-signin-nudge">Sign in with Google to save your score and appear here.</p>
+          <div className="lb-signin-nudge">
+            <p>Sign in with Google to save your score and appear here.</p>
+            <AuthButton user={user} />
+          </div>
         )}
       </div>
     </div>
