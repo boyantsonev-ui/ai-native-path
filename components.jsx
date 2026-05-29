@@ -747,7 +747,7 @@ function AuthButton({ user }) {
         title={`Signed in as ${name} · Click to sign out`}
       >
         {avatar
-          ? <img src={avatar} alt="" className="auth-avatar" />
+          ? <img src={avatar} alt="" className="auth-avatar" referrerPolicy="no-referrer" />
           : <span className="auth-initials">{name[0].toUpperCase()}</span>
         }
         <span className="auth-name">{name.split(" ")[0]}</span>
@@ -921,7 +921,10 @@ function LeaderboardPage({ user, onBack }) {
         )}
 
         {!user && window.__supabase && (
-          <p className="lb-signin-nudge">Sign in with Google to save your score and appear here.</p>
+          <div className="lb-signin-nudge">
+            <p>Sign in with Google to save your score and appear here.</p>
+            <AuthButton user={user} />
+          </div>
         )}
       </div>
     </div>
